@@ -1,0 +1,18 @@
+
+/* ---------- Overall Specifications ---------- */
+
+body {
+  font-size: 100%;
+}
+
+.footer-wrapper {
+  color: #444499;
+}
+
+.footer-wrapper a {
+  color: #217adf !important;
+}
+
+.footer-wrapper .block {
+  border: 0px !important;
+}

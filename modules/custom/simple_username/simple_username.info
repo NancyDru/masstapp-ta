@@ -1,0 +1,4 @@
+name = Simple Username
+description = Common Username stuff.
+core = 7.x
+package = Custom
