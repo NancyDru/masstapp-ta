@@ -105,7 +105,7 @@ function simple_username_enable() {
         ),
       'widget' => array('type' => 'textfield'),
       'display' => array(
-        'default' => array('label' => 'hidden'),
+        'default' => array('label' => 'inline'),
         ),
       );
 
