@@ -1,0 +1,95 @@
+<?php
+/**
+ * @file
+ * Custom functionality for MassTAPP-TA.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function mta_custom_menu() {
+  $items = array();
+
+  $items['admin/config/administration/mta_custom'] = array(
+    'title' => 'MassTAPP TA',
+    'description' => 'Various settings to control MassTAPP TA custom functions',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mta_custom_admin_settings'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+    );
+
+  return $items;
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function mta_custom_form_alter(&$form, &$form_state, $form_id) {
+  global $user;
+//  dpm($form, $form_id);
+  switch ($form_id) {
+    case 'weekly_report_node_form';
+      $day_of_week = variable_get('mta_custom_report_day', 'Friday');
+      // This returns the next xxx day on or after today.
+      $this_week = strtotime($day_of_week);
+
+      $how_many = variable_get('mta_custom_list_dates', 33);
+
+      $format = 'simple';
+      $date = $this_week;
+      $dates = array();
+      for ($i = 0; $i < $how_many; ++$i) {
+        $d = format_date($date, $format);
+        $dates[$d] = $d;
+        // Note there is a hiccup on Daylight Time changes.
+        $date -= 604800;    // One week.
+      }
+
+      // Change it to a select field.
+      $form['field_week'][LANGUAGE_NONE][0]['value']['#type'] = 'select';
+      $form['field_week'][LANGUAGE_NONE][0]['value']['#options'] = $dates;
+      if (is_null($form['field_week'][LANGUAGE_NONE][0]['value']['#default_value'])) {
+        $form['field_week'][LANGUAGE_NONE][0]['value']['#default_value'] = format_date($this_week, $format);
+      }
+
+      break;
+  }
+}
+
+/**
+ * Settings form.
+ */
+function mta_custom_admin_settings($form, $form_state) {
+  $days = array(
+    'Sunday' => t('Sunday'),
+    'Monday' => t('Monday'),
+    'Tuesday' => t('Tuesday'),
+    'Wednesday' => t('Wednesday'),
+    'Thursday' => t('Thursday'),
+    'Friday' => t('Friday'),
+    'Saturday' => t('Saturday'),
+    );
+  $form['mta_custom_report_day'] = array(
+    '#title' => t('Weekly Report Day of Week'),
+    '#type' => 'radios',
+    '#options' => $days,
+    '#required' => TRUE,
+    '#default_value' => variable_get('mta_custom_report_day', 'Friday'),
+    '#description' => t('This is the day of the week upon which Weekly Reports are submitted.'),
+    );
+
+  $weeks = range(1, 200, 4);
+  $weeks = array_combine($weeks, $weeks);
+  $form['mta_custom_list_dates'] = array(
+    '#title' => t('How many weeks back to offer'),
+    '#type' => 'radios',
+    '#options' => $weeks,
+    '#required' => TRUE,
+    '#default_value' => variable_get('mta_custom_list_dates', 33),
+    '#description' => t('This is how many weeks to show in the date list for Weekly Reports.'),
+    '#attributes' => array('class' => array('container-inline')),
+    );
+
+  return system_settings_form($form);
+}
