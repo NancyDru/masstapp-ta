@@ -161,3 +161,8 @@ body {
   border-color: #217adf;
   border-radius: 6px;
 }
+
+#weekly-report-node-form #edit-field-program-served  .form-item-field-program-served-und-entities-0-form-status,
+#weekly-report-node-form #edit-field-program-served .field-name-field-whos-involved {
+  display: none;
+}
