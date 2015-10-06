@@ -49,11 +49,129 @@ function mta_custom_form_alter(&$form, &$form_state, $form_id) {
       // Change it to a select field.
       $form['field_week'][LANGUAGE_NONE][0]['value']['#type'] = 'select';
       $form['field_week'][LANGUAGE_NONE][0]['value']['#options'] = $dates;
+      $form['field_week'][LANGUAGE_NONE][0]['value']['#description'] =
+        t('Please choose the @dow date that is appropriate for your report.',
+          array('@dow' => $day_of_week));
       if (is_null($form['field_week'][LANGUAGE_NONE][0]['value']['#default_value'])) {
         $form['field_week'][LANGUAGE_NONE][0]['value']['#default_value'] = format_date($this_week, $format);
       }
 
+      // And hide the numeric date field.
+      $form['field_week_date']['#access'] = FALSE;
+
       break;
+    case 'program_node_form';
+      $form['field_whos_involved']['#access'] = FALSE;
+
+      break;
+
+  }
+}
+
+/**
+ * Imlements hook_node_presave().
+ * Save the report date in numeric format.
+ */
+function mta_custom_node_presave($node) {
+  switch ($node->type) {
+    case 'weekly_report':
+      $d = strtotime($node->field_week[LANGUAGE_NONE][0]['value']);
+
+      $node->field_week_date = array(
+        LANGUAGE_NONE => array(
+          0 => array(
+            'value' => $d,
+            'value2' => $d,
+            'showtodate' => FALSE,
+            'offset' => 0,
+            'offset2' => 0,
+//            'timezone' => ,
+//            'timezone_db' => ,
+            'date_type' => 'datestamp',
+            ),
+          ),
+        );
+      break;
+
+    case 'program':
+      $program = entity_metadata_wrapper('node', $node);
+      $who = array();
+      foreach ($program->field_individual_hours->getIterator() as $individual) {
+        $who[] = format_username($individual->field_individual->value());
+      }
+      dpm(implode(', ', $who), 'who '.$program->title->value());
+      $node->field_whos_involved = array(
+        LANGUAGE_NONE => array(
+          0 => array(
+            'value' => filter_xss(implode(', ', $who)),
+            ),
+          ),
+        );
+      break;
+  }
+}
+
+/**
+ * Implements hook_inline_entity_form_table_fields_alter().
+ * Shows various fields on various content types.
+ */
+function mta_custom_inline_entity_form_table_fields_alter(&$fields, $context) {
+  foreach ($context['allowed_bundles'] as $type) {
+    switch ($type) {
+      case 'program':
+        unset($fields['status']);
+        $fields['field_outreach_hours'] = array(
+          'type' => 'field',
+          'label' => t('Outreach Hours'),
+          'settings' => array('scale' => 1),
+          'weight' => 11,
+          );
+        $fields['field_number_served'] = array(
+          'type' => 'field',
+          'label' => t('Number Served'),
+          'weight' => 16,
+          );
+        $fields['field_whos_involved'] = array(
+          'type' => 'field',
+          'label' => t('Individuals'),
+          'weight' => 21,
+          );
+        break;
+
+      case 'individual':
+        unset($fields['title']);
+        unset($fields['status']);
+        $fields['field_individual'] = array(
+          'type' => 'field',
+          'label' => t('Individual'),
+          'weight' => 11,
+          );
+        $fields['field_remote'] = array(
+          'type' => 'field',
+          'label' => t('Remote'),
+          'settings' => array('scale' => 1),
+          'weight' => 16,
+          );
+        $fields['field_in_person'] = array(
+          'type' => 'field',
+          'label' => t('In Person'),
+          'settings' => array('scale' => 1),
+          'weight' => 21,
+          );
+        $fields['field_prep'] = array(
+          'type' => 'field',
+          'label' => t('Prep'),
+          'settings' => array('scale' => 1),
+          'weight' => 26,
+          );
+        $fields['field_travel'] = array(
+          'type' => 'field',
+          'label' => t('Travel'),
+          'settings' => array('scale' => 1),
+          'weight' => 31,
+          );
+        break;
+    }
   }
 }
 
