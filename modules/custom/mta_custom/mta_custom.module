@@ -114,21 +114,26 @@ function mta_custom_inline_entity_form_table_fields_alter(&$fields, $context) {
     switch ($type) {
       case 'program':
         unset($fields['status']);
+        $fields['field_community'] = array(
+          'type' => 'field',
+          'label' => t('Community'),
+          'weight' => 11,
+          );
         $fields['field_outreach_hours'] = array(
           'type' => 'field',
           'label' => t('Outreach Hours'),
           'settings' => array('scale' => 1),
-          'weight' => 11,
+          'weight' => 16,
           );
         $fields['field_number_served'] = array(
           'type' => 'field',
           'label' => t('Number Served'),
-          'weight' => 16,
+          'weight' => 21,
           );
         $fields['field_whos_involved'] = array(
           'type' => 'field',
           'label' => t('Individuals'),
-          'weight' => 21,
+          'weight' => 26,
           );
         break;
 
