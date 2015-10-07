@@ -97,16 +97,10 @@ function mta_custom_node_presave($node) {
       $program = entity_metadata_wrapper('node', $node);
       $who = array();
       foreach ($program->field_individual_hours->getIterator() as $individual) {
-        $who[] = format_username($individual->field_individual->value());
+//        $who[] = format_username($individual->field_individual->value());
+        $who[] = $individual->title->value();
       }
-      dpm(implode(', ', $who), 'who '.$program->title->value());
-      $node->field_whos_involved = array(
-        LANGUAGE_NONE => array(
-          0 => array(
-            'value' => filter_xss(implode(', ', $who)),
-            ),
-          ),
-        );
+      $program->field_whos_involved->set(filter_xss(implode(', ', $who)));
       break;
   }
 }

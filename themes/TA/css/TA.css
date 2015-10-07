@@ -78,6 +78,10 @@ body {
   margin-right: 1%;
 }
 
+#weekly-report-node-form #edit-field-week .chosen-container {
+  width: 150px !important;
+}
+
 .node-weekly-report fieldset {
   clear: both;
 }
@@ -163,6 +167,10 @@ body {
 }
 
 #weekly-report-node-form #edit-field-program-served  .form-item-field-program-served-und-entities-0-form-status,
-#weekly-report-node-form #edit-field-program-served .field-name-field-whos-involved {
+#weekly-report-node-form #edit-field-program-served #edit-field-program-served-und-entities-0-form-field-whos-involved {
   display: none;
+}
+
+#weekly-report-node-form .ief-row-entity td.inline-entity-form-node-field_whos_involved {
+  display: normal;
 }
